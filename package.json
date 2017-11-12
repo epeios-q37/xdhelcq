@@ -1,0 +1,42 @@
+{
+  "name": "xdhelcq",
+  "version": "2017.11.8",
+  "author": "Claude SIMON (http://q37.info/contact/)",
+  "description": "'XDHTML' 'Electron' wrapper.",
+  "main": "XDHELCq.js",
+  "engines": {
+    "node": ">=4"
+  },
+  "binary": {
+    "module_name": "xdhelcq",
+    "module_path": "./",
+    "remote_path": "./epeios-q37/xdhelcq/releases/download/v20171108/",
+    "package_name": "{module_name}-v20171108-{platform}-{arch}.tar.gz",
+    "host": "https://github.com"
+  },
+  "dependencies": {
+
+  },
+  "devDependencies": {
+   "electron": "^1.7.9",
+   "electron-rebuild": "^1.6.0"
+  },
+  "scripts": {
+    "preinstall": "npm install node-pre-gyp",
+    "install": "node-pre-gyp install --fallback-to-build",
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/epeios-q37/xdhelcq.git"
+  },
+  "keywords": [
+    "addon","native","C++","njsq","electron","XDHTML","wrapper","native","desktop","ui","q37","epeios"
+  ],
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/epeios-q37/xdhelcq/issues"
+  },
+  "homepage": "https://github.com/epeios-q37/xdhelcq#readme",
+  "runkitExampleFilename": "runkit.js"
+}
