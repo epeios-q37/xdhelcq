@@ -1,5 +1,5 @@
 environment:
-  version: 20171108
+  version: 20171112
   affix: xdhelcq
   matrix:
     - nodejs_version: "8"
@@ -40,7 +40,7 @@ after_build:
 - mkdir %dir%
 - copy %affix%.node %dir%
 # It MUST be '.tar.gz' to be retrieved by 'node-pre-gyp' when installed with 'npm' !
-- 7z a %addon%.zip %dir%²
+- 7z a %addon%.zip %dir%
 
 # test_script:
 # - node --version

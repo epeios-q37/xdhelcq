@@ -34,6 +34,8 @@ along with the Epeios framework.  If not, see <http://www.gnu.org/licenses/>
 # include "txf.h"
 
 // Note to developer : include 'h:\hg\NJSIncludeDirectories.props' in the '.vcxproj'.
+# undef system	// Defined in 'tol.h'.
+// Headers included by below header make use of 'system' under 'macOS'.
 # include <v8.h>
 // Put after above line due to redefinition of 'System(...)'.
 # include "tol.h"

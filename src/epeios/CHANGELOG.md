@@ -5,6 +5,8 @@
   - Adding missing `override`.
 - CSDULC:
   - Fixing a *Clang* warning.
+- V8Q:
+  - Fixing an issue which sometimes occurs under *macOS* depending on the used *Node.js* version.
 
 2017-11-07:
 - STRMRG:
