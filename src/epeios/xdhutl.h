@@ -56,7 +56,10 @@ namespace xdhutl {
 
 	inline bso::bool__ IsKeyEvent( const str::string_ &Event )
 	{
-		return  !str::Compare( Event, str::string( "key" ), 0, 0, 3 );
+		if ( Event.Amount() >= 3 )
+			return  !str::Compare( Event, str::string( "key" ), 0, 0, 3 );
+		else
+			return false;
 	}
 
 	inline bso::bool__ IsKeyEvent( const char *Event )
@@ -137,6 +140,8 @@ namespace xdhutl {
 		str::string_ &Event )
 	{
 		if ( Name == "SELECT" )
+			Event.Append( "change" );
+		else if ( Name == "INPUT" )
 			Event.Append( "change" );
 		else
 			Event.Append( "click" );

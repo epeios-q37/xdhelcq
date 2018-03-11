@@ -1,4 +1,393 @@
-# *Epeios* changelog
+# *Epeios* *CHANGELOG**
+
+2018-02-27:
+- SCLMISC:
+  - moving `ExitOnSignal()`from *SCLTOOL* to *SCLMISC*,
+- SCLTOOL:
+   - *idem*,
+
+2018-02-19:
+- XDHUTL
+  - fixing bug occurring when event label size too small,
+
+2018-02-18:
+- *common*:
+  - **$**: reverting path parameter handling,
+- SCLXDHTML:
+  - adaptation to modifications in underlying modules,
+- XDHDWS:
+  - **$**,
+- XDHUJP:
+  - **$**,
+- XDHUJS:
+  - **$**,
+
+2018-02-16:
+- *common*:
+  - **$**: a path parameter is now coming along with *XSL* parameter, for the desktop version be able to load the file,
+- SCLXDHTML:
+  - adaptation to modifications in underlying modules,
+- XDHDWS:
+  - **$**,
+- XDHUJP:
+  - **$**,
+- XDHUJS:
+  - **$**,
+  - commenting out some obsolete functions,
+
+2018-02-14:
+- CSDMXC
+  - a failing server is no more blocking; however, the request has to be relaunched, an automatic reconnection has yet to be implemented.
+
+2018-01-31:
+- SCLJRE:
+  - fixing parameter mess with template variadics,
+
+2018-01-27:
+- V8Q:
+  - fixing missing method in *Node.js* v4,
+
+2018-01-26:
+- NODEQ:
+  - adaptation to modification in *V8Q*,
+ - N4NJS
+  - reporting missing callback,
+- SCLNJS:
+  - adaptation to modifications in *N4NJS*,
+- V8Q:
+  - a value and derived can now be initialized with an undefined value; useful to handle callback parameter, when none is provided by user,
+  - consolidation of the emptiness of an object,
+
+2018-01-25:
+- MTHTMC
+  - using *MTHRTN* instead of *MTHFRC*,
+- THT:
+  - introducing `rReadWrite`,
+
+2018-01-17:
+- *common*:
+  - **$**: handling array of strings,
+- N4ZND:
+  - **$**,
+- SCLZND:
+  - **$**,
+
+2018-01-16:
+- *common*:
+  - **$**: handling array of strings,
+- JNIQ:
+  - **$**,
+- N4JRE:
+  - **$**,
+- SCLJRE:
+  - **$**,
+
+2018-01-15:
+- *common*:
+  - **$**: adding handling of booleans,
+- N4JRE:
+  - **$**,
+- SCLJRE:
+  - **$**,
+
+2018-01-12:
+- *common*:
+  - **$**:
+    - improving *CSS* classes and rules handling,
+    - adding element disabling/enabling features,
+- SCLXDHTML:
+  - **$**,
+- XDHCMN:
+  - **$**,
+- XDHDWS:
+  - **$**,
+- XDHUJP:
+  - **$**,
+- XDHUJS:
+  - **$**,
+
+2018-01-11:
+- *common*:
+  - **$**: replacing *cast* related operations handling by operations on *CSS* related classes and rules (continued),
+- SCLXDHTML:
+  - **$**,
+- XDHCMN:
+  - **$**,
+- XDHDWS:
+  - **$**,
+- XDHUJP:
+  - **$**,
+- XDHUJR:
+  - **$**,
+- XDHUJS:
+  - **$**,
+
+2018-01-10:
+- *common*:
+  - **$**: replacing *cast* related operations handling by operations on *CSS* related classes and rules,
+- SCLXDHTML:
+  - **$**,
+- XDHCMN:
+  - **$**,
+- XDHDWS:
+  - **$**,
+- XDHUJP:
+  - **$**,
+- XDHUJR:
+  - **$**,
+- XDHUJS:
+  - **$**,
+- XDHUTL:
+  - fixing *Clang* warning,
+
+2018-01-09:
+- *common*:
+  - **$**: getting rid of faulty `type &var = *(type *)NULL` parameter definitions,
+- BTR:
+  - adding some default parameter to ease the modification in *IDXBTR* (see below),
+- CSDMXS:
+  - fixing missing `override` to overriding virtual function,
+- CSDMXC:
+  - fixing *clang* warning,
+- IDXBTR:
+  - **$**,
+- IDXBTQ:
+  - **$**,
+- TOL:
+  - adding a feature to ease the temporary disabling of the `system` function message warning.
+- V8Q:
+  - fixing issue with the `v8.h` use of the `system` command (see above),
+
+2018-01-05:
+- V8Q:
+  - fixing *g++* warning,
+- XDHUPS:
+  - adding `dlbrry::eNormalization` parameter to `agent___::Init(...)`, due to fact that *Node.js* (*node-pre-gyp*) does not prepend dynamic libraries with the usual `lib` prefix under *POSIX*.
+
+2018-01-02:
+- CSDMXC:
+  - Fixing bad variable type,
+- SCLXDHTML:
+  - Fixing missing update due to previous modification,
+  
+2017-12-28:
+- *Common*:
+  - **$** : adding `Execute` function,
+- CDSDCMN:
+  - adding `Put(...)` variant to resolve some template ambiguity,
+- XDHCMN:
+  - **$**,
+- XDHDWS:
+  - **$**,
+- XDHUJP:
+  - **$**,
+- XDHUJS:
+  - **$**,
+
+2017-12-26:
+- *Common*:
+  - **$**: *casts* can now be set by ids or by tags,
+- SCLXDHTML:
+  - **$**,
+- XDHCMN:
+  - **$**,
+- XDHDWS:
+  - **$**,
+- XDHUJP:
+  - **$**,
+
+2017-12-21:
+- SCLXDHTML
+  - fixing issue with casting.
+
+2017-12-20:
+- SCLJRE, SCLZND:
+  - adaptation to changes in underlying modules,
+
+2017-12-19:
+- *Common*:
+  - **$1**: more that one wrapper can now be loaded together,
+  - **$2**: adaptation to modifications of underlying modules,
+- MTHITG:
+  - **$2**,
+- MTHRTNn:
+  - **$2**,
+- N4ALL:
+  - **$1**,
+- SCLNJS:
+  - fixing some issues due to previous modifications of this module,
+  - fixing some *g++*/*Clang* issues,
+- V8Q:
+  - adding `v8::External` related functions,
+  - fixing some *v8* coming deprecating issue on string object.
+
+2017-12-17:
+- SCLNJS:
+  - handling Strings.
+
+2017-12-16:
+- SCLNJS:
+  - adding `rCore_::HasAssignation`,
+
+2017-12-15:
+- SCLNJS:
+  - functions handling `dArguments` become methods attached to `dArguments`; this will simplify below new feature,
+  - a callback can now be launched with all their arguments stored in a `dArguments`object.
+- TOL:
+  - Adding `*` operator to wrapped (`qW(...)`) object to expose the unwrapped version (`d...`) of the object; this facilitates the disambiguation when using template variadics,
+
+2017-12-14:
+- *Common*:
+  - **$**: adding optional `First` parameter to `Search(...)` functions.
+- CTN:
+  - **$**,
+- STR:
+  - **$**,
+- XDHUJP:
+  - finalization of below new features (continued),
+
+2017-12-11:
+- *Common*:
+  - **$**: finalization of below new features (continued),
+- SCLXDHTML:
+  - **$**,
+- V8Q:
+  - Implementing `ToArray(...)`.
+- XDHUJP:
+  - **$**,
+
+2017-12-10:
+- *Common*:
+  - **$**: finalization of below new features,
+- SCLXDHTML:
+  - **$**,
+- XDHUJP:
+  - **$**,
+- XDHUJS:
+  - **$**,
+
+2017-12-09:
+- *Common*:
+  - **$**:  new *casting* handling (continued),
+- SCLXDHTML:
+  - **$**,
+- XDHUJP:
+  - **$**,
+
+2017-12-08:
+- *Common*:
+  - **$1**: unifying argument handling,
+  - **$2**: new *casting* handling,
+- N4NJS:
+  - **$1**,
+- SCLN4A:
+  - **$1**,
+- SCLNJS:
+  - **$1**,
+- SCLXDHTML:
+  - **$2**.
+- XDHCMN:
+  - **$2**.
+- XDHDWS:
+  - **$2**.
+- XDHUJP:
+  - **$2**.
+
+2017-12-07:
+- *Common*:
+  - **$** : adding strings and callbacks handling.
+- N4NJS:
+  - **$**.
+
+2017-12-06:
+- SCLMISC:
+  - Adding variant of `LoadXMLAndTranslateTags(...)`.
+
+2017-12-05:
+- *Common*:
+  - **$** : reworking of the content handling setting to handle correctly the widgets (continued).
+- SCLXDHTML:
+  - **$**,
+  - some function are becoming `rSession` methods,
+  - simplification.
+- XDHCMN:
+  - **$**.
+- XDHDWS:
+  - **$**.
+- XDHUJP:
+  - **$**.
+- XDHUJS:
+  - **$**.
+- XDHUJR:
+  - **$**.
+
+2017-12-04:
+- *Common*:
+  - **$** : Reworking of the content handling setting to handle correctly the widgets.
+- SCLXDHTML:
+  - **$**.
+- XDHCMN:
+   - **$**,
+   - Adding `Flat(Merge|Split(...))`functions.
+- XDHDWS:
+   - **$**.
+- XDHUJR:
+   - **$**.
+- XDHUJS:
+   - **$**.
+
+2017-12-03:
+- N4NJS:
+  - Handling return value when calling a callback.
+  
+2017-12-01:
+- N4NJS, NODEQ, SCLNJS:
+  - Adding handling of generic object type.
+- N4NJS:
+  - Merging `eArgumentType_` with `eType`.
+- SCLNJS:
+  - Handling return value when calling a callback.
+  - Adaptation to changes in *N4NJS*.
+
+2017-11-30:
+- FLX, TXF:
+  - Introducing `R` (read) and `W` (write) prefixed objects.
+- SCK:
+  - Introducing `Undefined`.
+- SCLJRE:
+  - Introducing some function to ease the handling of user data.
+  - Adding `rObject::CallVoidMethod(...)` .
+
+2017-11-29:
+- N4JRE, SCLJRE:
+  - Adding *Short* *Java* type related stuff.
+- SCK:
+  - Adding default timout parameter.
+- SCLJRE:
+  - Fixing `Null()`, according modification of `JREq`.
+  - Moving `Delete_` to *.cpp* to avoid some confusion by compilators when user declares some function of some name.
+ - SCLXDHTML:
+   - Adding `Mode` parameter handling for `SCLXDHTMLRetrieveCallback`.
+
+2017-11-28:
+- FLW:
+  - Adding `R`(ead) and `W`(rite) prefix as synonym for `I`(nput) and `O`(utput).
+
+2017-11-24:
+- SCLXDHTML, XDHDWS, XDHUJP :
+  - Introducing the possibility to put the content before handling widgets (*jQuery* related stuff) when setting the layout, or some widget (*jQTE*, for example) are not properly pre-filled. 
+
+2017-11-21:
+- SCLFRNTND:
+  - Fixing bad handling when no backend is selected.
+
+2017-11-20:
+- SCLMISC:
+  - Adding target to the message displayed when unable to load locale or configuration file.
+
+2017-11-13:
+- LOG:
+  - Becomes *LOGQ*, to avoid some conflict.
 
 2017-11-12:
 - CSDLEC:
@@ -6,7 +395,7 @@
 - CSDULC:
   - Fixing a *Clang* warning.
 - V8Q:
-  - Fixing an issue which sometimes occurs under *macOS* depending on the used *Node.js* version.
+  - (**reverted**; was already partially handled and will find another way to fix this issue) Fixing an issue which sometimes occurs under *macOS* depending on the used *Node.js* version.
 
 2017-11-07:
 - STRMRG:

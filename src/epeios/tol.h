@@ -240,6 +240,14 @@ public:\
 		d##name::operator =( O );\
 \
 		return *this;\
+	}\
+	const d##name &operator *( void ) const\
+	{\
+		return *this;\
+	}\
+	d##name &operator *( void )\
+	{\
+		return *this;\
 	}
 
 // Wraps 'vName' to make it instantiable.
@@ -1301,7 +1309,9 @@ public:\
 	}\
 };
 
-#define system	use_System_from_tol_library	// Pour forcer l'utilisation de 'tol::System(...)'.
+// Helps to temporary disable the 'system' warning message when 'system' used by underlying library.
+# define TOL_SYSTEM_MACRO	use_System_from_tol_library	// To force the use of 'tol::System(...)'.
+# define system	TOL_SYSTEM_MACRO
 
 namespace tol {
 	class UP__

@@ -30,7 +30,6 @@
     </Value>
     <Dialog>
      <Alert><![CDATA[
-						// log( "%XML%" );
 						dialog = document.createElement( "span" );
 						dialog.innerHTML = transformToHTML( "%XML%", "%XSL%" );
 						$(dialog).dialog({modal: true},{title: "%Title%"},{width: "auto"} ,{closeText: "%CloseText%"});
@@ -63,36 +62,22 @@
 					.on( 'drop', function( event ) { log( 'drop : ' + event.target.id + " ; " + event.relatedTarget.id ); launchEvent( event.target, "drop" );} );
 				]]>    </DroppableSetter>
     <Fetcher>
-     <EventsAndWidgets><![CDATA[
-						log( "'%Id%'" );
-						log( "%XML%" );
+     <Events><![CDATA[
+					 console.log( "%XSL%" );
 						removeChildren( "%Id%" );
-						document.getElementById( "%Id%" ).appendChild( transformToFragment( "%XML%", "%XSL%" ) );"";
-						var digests = fetchEventHandlersAndWidgets( "%Id%" );
+						getElement( "%Id%" ).appendChild( transformToFragment( "%XML%", "%XSL%" ) );"";
+						var digests = fetchEventHandlers( "%Id%" );
 						digests;
-					]]>     </EventsAndWidgets>
-     <Casts><![CDATA[
-					// Edge executes this script in loop !!!
-					log( "Casting : '%Id%'" );
-					log( "%XML%" );
-					removeCastingChildren( document );
-					document.getElementById( "xdh-casting" ).appendChild( transformToFragment( "%XML%", "%XSL%" ) );
-					var digest = fetchCasts( "%Id%" );
+					]]>     </Events>
+     <Widgets><![CDATA[
+					var digest = fetchWidgets( "%Id%" );
 					digest;
-				]]>     </Casts>
-     <Contents><![CDATA[
-					log( "Contents fetching : '%Id%'" );
-					var digest = fetchContents( "%Id%" );
-					digest;
-				]]>     </Contents>
+				]]>     </Widgets>
     </Fetcher>
     <Setter>
      <EventHandlers><![CDATA[
 					setEventHandlers( %Ids_%, %Events_% );
 				]]>     </EventHandlers>
-     <Casts><![CDATA[
-					setCasts( %Ids_%, %Casts_% );
-				]]>     </Casts>
      <Contents><![CDATA[
 					setContents( %Ids_%, %Contents_% );
 				]]>     </Contents>
@@ -101,10 +86,10 @@
 					instantiateWidgets( %Ids_%, %Types_%, %ParametersSets_% );
 				]]>    </WidgetsInstantiator>
     <Focuser><![CDATA[
-						jQuery(document.getElementById( "%Id%" )).focus();
+						document.getElementById( "%Id%" ).focus();
 					]]>    </Focuser>
     <Selector><![CDATA[
-						jQuery(document.getElementById( "%Id%" )).select();
+						document.getElementById( "%Id%" ).select();
 					]]>    </Selector>
     <Log><![CDATA[
 						log( "%Message%" );
@@ -128,10 +113,39 @@
 							jQuery( document.getElementById( "%Id%") ).%Method_%
 						]]>     </Selector>
     </Widget>
+    <CSSRule>
+     <Insert><![CDATA[
+							insertCSSRule( "%Rule%", %Index% );
+						]]>     </Insert>
+     <Append><![CDATA[
+							insertCSSRule( "%Rule%", -1 ).toString();
+						]]>     </Append>
+     <Remove><![CDATA[
+							removeCSSRule( %Index% );
+						]]>     </Remove>
+    </CSSRule>
+    <Classes>
+     <Add><![CDATA[
+							addClasses( %Ids_%, %Classes_% );
+						]]>     </Add>
+     <Remove><![CDATA[
+							removeClasses( %Ids_%, %Classes_% );
+						]]>     </Remove>
+     <Toggle><![CDATA[
+							toggleClasses( %Ids_% , %Classes_% );
+						]]>     </Toggle>
+    </Classes>
+    <Elements>
+     <Enable><![CDATA[
+							enableElements( %Ids_% );
+						]]>     </Enable>
+     <Disable><![CDATA[
+							disableElements( %Ids_% );
+						]]>     </Disable>
+    </Elements>
    </Scripts>
   </Definitions>
   <Parameters>
-   <ModuleFilename>h:/bin/esketchxdh</ModuleFilename>
    <Language>en</Language>
    <Command>Launch</Command>
   </Parameters>
@@ -178,14 +192,10 @@
    <Argument id="Usage" Description="UsageCommandDescription" long="help" Value="Usage"/>
    <Argument id="Version" Description="VersionCommandDescription" long="version" Value="Version"/>
    <Argument id="License" Description="LicenseCommandDescription" long="license" Value="License"/>
-   <Argument id="LaunchCommand" Description="LaunchCommandDescription" long="launch" short="l" Value="Launch" Usage="%TestFlag% %TestOption% %TestArgument%"/>
-   <Argument id="TestFlag" Description="TestFlagDescription" long="flag" short="f" Path="Flag" Value="TestFlag"/>
-   <Argument id="TestOption" Description="TestOptionDescription" long="option" short="o" Path="Option" Label="TestOptionLabel"/>
-   <Argument id="ComponentArgument" Description="ComponentArgumentDescription" Path="ComponentFilename" Label="ComponentArgumentLabel"/>
+   <Argument id="LaunchCommand" Description="LaunchCommandDescription" long="launch" short="l" Value="Launch" Usage="%ModuleFilenameOption%"/>
+   <Argument id="ModuleFilenameOption" Description="ModuleFilenameOptionDescription" long="module" short="m" Path="ModuleFilename" Label="ModuleFilenameOptionLabel"/>
    <Layouts>
-    <Layout command="Launch">
-     <Link index="0" Target="ComponentArgument"/>
-    </Layout>
+    <Layout command="Launch"/>
    </Layouts>
   </Arguments>
  </Configuration>

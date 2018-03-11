@@ -46,11 +46,13 @@ namespace xdhcmn {
 	// NOTA : not used by this module, but by other 'upstream' and 'downtream' 'XDH...' modules.
 	typedef ntvstr::char__ nchar__;
 	typedef ntvstr::string___ nstring___;
+	typedef ntvstr::rString rNString;
+	qMIMICs( bso::sU16, sIndex );	// For the 'CSS' rules.
 
 	static E_CDEF( char *, CloseActionLabel, "Q37Close" );
 	static E_CDEF( char *, RefreshActionLabel, "Q37Refresh" );
 
-	E_ENUM( mode ) {
+	qENUM( Mode ) {
 		mMonoUser,	// One use only. The content of the project (i.e. which backend type to use) is defined by the user.
 		mMultiUser,	// Several users. The project (which defines the backend to use) is predefiend in the configuration file.
 		m_amount,
@@ -74,12 +76,21 @@ namespace xdhcmn {
 	};
 
 	enum function__ {		// Parameters :
+		fExecute,			// Script,
 		fLog,				// Message,
 		fAlert,				// XML, XSL, Title.
 		fConfirm,			// XML, XSL, Title.
-		fSetCasting,		// Id, XML, XSL.
-		fSetContents,		// Id.
 		fSetLayout,			// Id, XML, XSL.
+		fSetContents,		// Ids, Contents.
+		fDressWidgets,		// Id.
+		fInsertCSSRule,		// Rule, Index.
+		fAppendCSSRule,		// Rule.
+		fRemoveCSSRule,		// Index.
+		fAddClasses,		// Ids, Classes.
+		fRemoveClasses,		// Ids, Classes.
+		fToggleClasses,		// Ids, Classes.
+		fEnableElements,	// Ids.
+		fDisableElements,	// Ids.
 		fSetProperty,		// Id, Name, Value.
 		fGetProperty,		// Id, Name.
 		fSetAttribute,		// Id, Name, Value.
@@ -123,34 +134,6 @@ namespace xdhcmn {
 		}
 	};
 
-	class cContent
-	{
-	protected:
-		virtual void XDHCMNGetContent(
-			const str::dString &Tag,
-			str::dString &Content )
-		{
-			qRFwk();	// Called by below method, so if below method is not overridden, you have to override this one.
-		}
-		virtual void XDHCMNGetContents(
-			const str::dStrings &Tags,
-			str::dStrings &Contents );
-	public:
-		qCALLBACK( Content );
-		void GetContent(
-			const str::dString &Tag,
-			str::dString &Content )
-		{
-			return XDHCMNGetContent( Tag, Content );
-		}
-		void GetContents(
-			const str::dStrings &Tags,
-			str::dStrings &Contents )
-		{
-			return XDHCMNGetContents( Tags, Contents );
-		}
-	};
-
 #pragma pack( push, 1)
 	// NOTA : is modified, increment 'CSDLEO_SHARED_DATA_VERSION' !
 	class shared_data__
@@ -158,7 +141,7 @@ namespace xdhcmn {
 	private:
 		const char *_Version;	// Toujours en premire position.
 		bso::uint__ _Control;	// Une valeur relative au contenu de la structure,  des fins de test primaire de compatibilit.
-		mode__ _Mode;
+		eMode _Mode;
 		const char *_LauncherIdentification;
 		const char *_Localization;
 		sclmisc::sRack SCLRack_;
@@ -174,7 +157,7 @@ namespace xdhcmn {
 		}
 		E_CDTOR( shared_data__ );
 		void Init(
-			mode__ Mode,
+			eMode Mode,
 			const char *LauncherIdentification,
 			const char *Localization )
 		{
@@ -192,7 +175,7 @@ namespace xdhcmn {
 		qRWDISCLOSEs( sclmisc::sRack, SCLRack );
 		Q37_PMDF( const char, LauncherIdentification, _LauncherIdentification );
 		Q37_PMDF( const char, Localization, _Localization );
-		E_RODISCLOSE__( mode__, Mode );
+		E_RODISCLOSE__( eMode, Mode );
 	};
 #pragma pack( pop )
 
@@ -234,7 +217,7 @@ namespace xdhcmn {
 	void Escape(
 		const str::string_ &Source,
 		str::string_ &Target,
-		bso::char__ Delimiter,	// Devrait tre '\'', '"' ou 0. Si 0, chappe '\'' et '\"', sinon chappe 'Delimiter'.
+		bso::char__ Delimiter,	// Should be '\'', '"' or 0. If 0, escapes '\'' and '\"', otherwise escapes 'Delimiter'.
 		bso::char__ EscapeChar = strmrg::DefaultEscapeToken );
 #if 0
 	void Unescape(
@@ -251,7 +234,21 @@ namespace xdhcmn {
 
 	using strmrg::retriever__;
 
+	// Merge 'Splitted', delimited by '"', and separated by ','.
+	void FlatMerge(
+		const str::dStrings &Splitted,
+		str::dString &Merged,
+		bso::sBool AsJSArray );	// If 'true', the splitted items are enclosed between '[]', so the result can be used as JS array; above function does then NOT work.
 
+	// Reverse of above (if 'AsJSArray' was to 'false').
+	void FlatSplit(
+		flw::sRFlow &Flow,
+		str::dStrings &Splitted );
+
+	// Variant of above.
+	void FlatSplit(
+		const str::dString &Merged,
+		str::dStrings &Splitted );
 }
 
 #endif

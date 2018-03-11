@@ -33,11 +33,17 @@ along with the Epeios framework.  If not, see <http://www.gnu.org/licenses/>
 # include "str.h"
 # include "txf.h"
 
+// If 'TOL' was already included, we have to 'undefine' the 'system' macro it creates due to 'v8.h' using this function.
+# ifdef TOL_SYSTEM_MACRO
+#  undef system
+# endif
 // Note to developer : include 'h:\hg\NJSIncludeDirectories.props' in the '.vcxproj'.
-# undef system	// Defined in 'tol.h'.
-// Headers included by below header make use of 'system' under 'macOS'.
 # include <v8.h>
-// Put after above line due to redefinition of 'System(...)'.
+// Restoring the 'system' macro defined by 'TOL', if it was already included.
+# ifdef TOL_SYSTEM_MACRO
+#  define system TOL_SYSTEM_MACRO
+# endif
+// Put after above line due to redefinition of 'system(...)'.
 # include "tol.h"
 
 namespace v8q {
@@ -53,11 +59,46 @@ namespace v8q {
 			return Isolate;
 	}
 
+	inline v8::Local<v8::Context> GetContext( v8::Isolate *Isolate = NULL )
+	{
+		return GetIsolate( Isolate )->GetCurrentContext();
+	}
+
+	template <typename t> inline v8::Local<t> ToLocal(
+		v8::MaybeLocal<t> V,
+		v8::Isolate *Isolate = NULL )
+	{
+		if ( V.IsEmpty() )
+			return v8::Null( GetIsolate( Isolate ) );
+		else
+			return V.ToLocalChecked();
+	}
+
+	inline v8::Local<v8::Object> ToLocal(
+		v8::MaybeLocal<v8::Object> Object,
+		v8::Isolate *Isolate = NULL )
+	{
+		if ( Object.IsEmpty() )
+			qRFwk();
+
+		return Object.ToLocalChecked();
+	}
+
+	inline v8::Local<v8::String> ToLocal(
+		v8::MaybeLocal<v8::String> String,
+		v8::Isolate *Isolate = NULL )
+	{
+		if ( String.IsEmpty() )
+			qRFwk();
+
+		return String.ToLocalChecked();
+	}
+
 	inline v8::Local<v8::String> ToString(
 		const char *String,
 		v8::Isolate *Isolate = NULL )
 	{
-		return v8::String::NewFromUtf8( GetIsolate( Isolate ), String );
+		return ToLocal( v8::String::NewFromUtf8( GetIsolate( Isolate ), String, v8::NewStringType::kNormal ) );
 	}
 
 	inline v8::Local<v8::String> ToString(
@@ -73,6 +114,25 @@ namespace v8q {
 	qRT
 	qRE
 		return Result;
+	}
+
+	inline v8::Local<v8::Array> ToArray(
+		const str::dStrings &Strings,
+		v8::Isolate *Isolate = NULL )
+	{
+		sdr::sRow Row = Strings.First();
+		Isolate = GetIsolate( Isolate );
+
+		v8::Local<v8::Array> Array = v8::Array::New( Isolate, Strings.Amount() );
+
+		while ( Row != qNIL ) {
+			if ( !Array->Set( GetContext( Isolate ), *Row, ToString( Strings( Row ), Isolate ) ).FromJust() )
+				qRFwk();
+
+			Row = Strings.Next( Row );
+		}
+
+		return Array;
 	}
 
 	template <typename arg> inline void Set_(
@@ -138,42 +198,46 @@ namespace v8q {
 		Set_( Isolate, argv, Position + 1, Args... );
 	}
 
-	template <typename t> inline v8::Local<t> ToLocal(
-		v8::MaybeLocal<t> V,
-		v8::Isolate *Isolate = NULL )
-	{
-		if ( V.IsEmpty() )
-			return v8::Null( GetIsolate( Isolate ) );
-		else
-			return V.ToLocalChecked();
-	}
-
-	inline v8::Local<v8::Script> ToLocal(
-		v8::MaybeLocal<v8::Script> Script,
-		v8::Isolate *Isolate = NULL )
-	{
-		if ( Script.IsEmpty() )
-			qRFwk();
-
-		return Script.ToLocalChecked();
-	}
-
-	inline v8::Local<v8::Object> ToLocal(
-		v8::MaybeLocal<v8::Object> Object,
-		v8::Isolate *Isolate = NULL )
-	{
-		if ( Object.IsEmpty() )
-			qRFwk();
-
-		return Object.ToLocalChecked();
-	}
-
 	template <typename t> t Expose( v8::Maybe<t> V )
 	{
 		if ( !V.IsJust() )
 			qRFwk();
 
 		return V.FromJust();
+	}
+
+	inline bso::sBool IsExternal( v8::Local<v8::Value> Value )
+	{
+		return Value->IsExternal();
+	}
+
+	inline bso::sBool IsExternal( v8::MaybeLocal<v8::Value> Value )
+	{
+		return IsExternal( Value.ToLocalChecked() );
+	}
+
+	inline v8::Local<v8::External> ToExternal( v8::Local<v8::Value> Value )
+	{
+		if ( !IsExternal( Value ) )
+			qRFwk();
+
+		return v8::Local<v8::External>::Cast( Value );
+	}
+
+	inline v8::Local<v8::External> ToExternal(
+		v8::MaybeLocal<v8::Value> Value,
+		v8::Isolate *Isolate = NULL )
+	{
+		return ToExternal( ToLocal( Value, Isolate ) );
+	}
+
+	inline v8::Local<v8::External> ToExternal(
+		void *Value,
+		v8::Isolate *Isolate = NULL )
+	{
+		Isolate = GetIsolate( Isolate );
+
+		return ToExternal( v8::External::New( Isolate, Value ), Isolate );
 	}
 
 	inline bso::sBool IsFunction( v8::Local<v8::Value> Value )
@@ -201,7 +265,6 @@ namespace v8q {
 		return ToFunction( ToLocal( Value, Isolate ) );
 	}
 
-
 	inline v8::Local<v8::Function> GetFunction(
 		v8::Local<v8::Context> Context,
 		v8::Local<v8::Object> Object,
@@ -212,11 +275,6 @@ namespace v8q {
 		return ToFunction( Object->Get( Context, ToString( Key, Isolate ) ), Isolate );
 	}
 
-	inline v8::Local<v8::Context> GetContext( v8::Isolate *Isolate = NULL )
-	{
-		return GetIsolate( Isolate )->GetCurrentContext();
-	}
-
 	inline v8::Local<v8::Function> GetFunction(
 		v8::Local<v8::Object> Object,
 		const char *Key,
@@ -225,6 +283,15 @@ namespace v8q {
 		return GetFunction( GetContext( Isolate ), Object, Key, Isolate );
 	}
 
+	inline v8::Local<v8::Script> ToLocal(
+		v8::MaybeLocal<v8::Script> Script,
+		v8::Isolate *Isolate = NULL )
+	{
+		if ( Script.IsEmpty() )
+			qRFwk();
+
+		return Script.ToLocalChecked();
+	}
 
 	inline v8::Local<v8::Value> Execute(
 		const char *Script,
@@ -236,6 +303,19 @@ namespace v8q {
 		return ToLocal( ToLocal( v8::Script::Compile( Context, ToString( Script, Isolate ) ), Isolate )->Run( Context ), Isolate );
 	}
 
+	template <typename type> v8::Local<type> Cast_(
+		v8::Local<v8::Value> Value,
+		bso::sBool UndefinedForbidden,
+		bool (v8::Value::*Function)(void) const )
+	{
+		if ( ((*Value)->*Function)() )
+			return v8::Local<type>::Cast( Value );
+		else if ( UndefinedForbidden )
+			qRFwk();
+
+		return v8::Local<type>();
+	}
+
 	template <typename item> class rPData_
 	{
 	private:
@@ -243,9 +323,19 @@ namespace v8q {
 	protected:
 		void Init(
 			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
+			bool (v8::Value::*Function)(void) const,
 			v8::Isolate *Isolate = NULL )
 		{
-			Core_.Reset( GetIsolate( Isolate ), v8::Local<item>::Cast( Value ) );
+			Core_.Reset( GetIsolate( Isolate ), Cast_<item>( Value, UndefinedForbidden, Function ) );
+		}
+		v8::Local<item> Get_( v8::Isolate *Isolate ) const
+		{
+			// Do not exists in 'Node.js' v4.
+			// return Core_.Get( GetIsolate( Isolate ) );
+
+			// This is the definition of v8::Persistent<>::Get()' in 'Node.js' >v4.
+			return v8::Local<item>::New( Isolate, Core_ );
 		}
 	public:
 		void reset( bso::sBool P = true )
@@ -259,11 +349,23 @@ namespace v8q {
 		}
 		v8::Local<item> Core( v8::Isolate *Isolate = NULL ) const
 		{
-			// Do not exists in 'Node.js' v4.
-			// return Core_.Get( GetIsolate( Isolate ) );
+			if ( Core_.IsEmpty() )
+				qRFwk();
 
-			// This is the definition of v8::Persistent<>::Get()' in 'Node.js' >v4.
-			return v8::Local<item>::New( GetIsolate( Isolate ), Core_ );
+			return Get_( GetIsolate( Isolate ) );
+		}
+		bso::sBool IsEmpty( v8::Isolate *Isolate = NULL ) const
+		{
+			if ( Core_.IsEmpty() )
+				return true;
+			else {
+				v8::Local<item> Item = Get_( GetIsolate( Isolate ) );
+
+				if ( Item->IsNull() )
+					return true;
+				else
+					return Item->IsUndefined();
+			}
 		}
 	};
 
@@ -274,9 +376,11 @@ namespace v8q {
 	protected:
 		void Init(
 			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
+			bool (v8::Value::*Function)(void) const,
 			v8::Isolate *Isolate = NULL )
 		{
-			Core_ = v8::Local<item>::Cast( Value );
+			Core_ = Cast_<item>( Value, UndefinedForbidden, Function );
 		}
 	public:
 		void reset( bso::sBool P = true )
@@ -292,6 +396,15 @@ namespace v8q {
 		{
 			return Core_;
 		}
+		bso::sBool IsEmpty( void ) const
+		{
+			if ( Core_.IsEmpty() )
+				return true;
+			else if ( Core()->IsNull() )
+				return true;
+			else
+				return Core()->IsUndefined();
+		}
 	};
 
 	template <typename data> class xValue_
@@ -300,6 +413,7 @@ namespace v8q {
 	public:
 		using data::reset;
 		using data::Core;
+		using data::IsEmpty;
 		qCDTOR( xValue_ );
 		xValue_(
 			v8::Local<v8::Value> Value,
@@ -308,10 +422,6 @@ namespace v8q {
 			data::Init( Value, Isolate );
 		}
 		using data::Init;
-		bso::sBool IsNull( void ) const
-		{
-			return Core()->IsNull();
-		}
 	};
 
 # ifdef T
@@ -374,12 +484,24 @@ namespace v8q {
 		}
 		void Init(
 			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
+			bool (v8::Value::*Function)(void) const,
 			v8::Isolate *Isolate = NULL )
 		{
-			if ( !Value->IsObject() )
-				qRFwk();
-
-			value::Init( Value, Isolate );
+			value::Init( Value, UndefinedForbidden, Function, Isolate ); 
+		}
+		void Init(
+			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
+			v8::Isolate *Isolate = NULL )
+		{
+			Init( Value, UndefinedForbidden, &v8::Value::IsObject, Isolate );
+		}
+		void Init(
+			v8::Local<v8::Value> Value,
+			v8::Isolate *Isolate = NULL )
+		{
+			Init( Value, true, Isolate );
 		}
 		v8::Local<v8::Value> Get(
 			const char *Key,
@@ -394,7 +516,8 @@ namespace v8q {
 			v8::Isolate *Isolate = NULL,
 			qRPD )
 		{
-			if ( !Expose( Core()->Set( GetContext(), v8q::ToString( Key, Isolate ), Value ) ) ) {
+			Isolate = GetIsolate( Isolate );
+			if ( !Expose( Core()->Set( GetContext( Isolate ), v8q::ToString( Key, Isolate ), Value ) ) ) {
 				if ( qRPU )
 					qRFwk();
 				else
@@ -495,12 +618,16 @@ namespace v8q {
 		}
 		void Init(
 			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
 			v8::Isolate *Isolate = NULL )
 		{
-			if ( !Value->IsFunction() )
-				qRFwk();
-
-			object::Init( Value, Isolate );
+			object::Init( Value, UndefinedForbidden, &v8::Value::IsFunction, Isolate );
+		}
+		void Init(
+			v8::Local<v8::Value> Value,
+			v8::Isolate *Isolate = NULL )
+		{
+			Init( Value, true, Isolate );
 		}
 		void Init(
 			v8::FunctionCallback Function,
@@ -576,30 +703,36 @@ namespace v8q {
 		}
 		void Init(
 			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
 			v8::Isolate *Isolate = NULL )
 		{
-			if ( !Value->IsString() )
-				qRFwk();
-
-			name::Init( Value, Isolate );
+			name::Init( Value, UndefinedForbidden, &v8::Value::IsString, Isolate );
+		}
+		void Init(
+			v8::Local<v8::Value> Value,
+			v8::Isolate *Isolate = NULL )
+		{
+			Init( Value, true, Isolate );
 		}
 		void Init(
 			const char *String,
 			v8::Isolate *Isolate = NULL )
 		{
-			name::Init( ToString( String, Isolate ) );
+			Isolate = GetIsolate( Isolate );
+
+			Init( ToString( String, Isolate ), Isolate );
 		}
 		void Init(
 			const str::dString &String,
 			v8::Isolate *Isolate = NULL )
 		{
-			qRH
-				TOL_CBUFFER___ Buffer;
-			qRB
-				Init( String.Convert( Buffer ), Isolate );
-			qRR
-				qRT
-				qRE
+		qRH;
+			TOL_CBUFFER___ Buffer;
+		qRB;
+			Init( String.Convert( Buffer ), Isolate );
+		qRR;
+		qRT;
+		qRE;
 		}
 		// NOT the number of char, but the size of the string in bytes, WITHOUT NULL terminating char.
 		int Size( void ) const
@@ -637,12 +770,16 @@ namespace v8q {
 		}
 		void Init(
 			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
 			v8::Isolate *Isolate = NULL )
 		{
-			if ( !Value->IsBoolean() )
-				qRFwk();
-
-			primitive::Init( Value, Isolate );
+			primitive::Init( Value, UndefinedForbidden, &v8::Value::IsBoolean, Isolate );
+		}
+		void Init(
+			v8::Local<v8::Value> Value,
+			v8::Isolate *Isolate = NULL )
+		{
+			Init( Value, true, Isolate );
 		}
 		void Init(
 			bool Boolean,
@@ -680,12 +817,16 @@ namespace v8q {
 		}
 		void Init(
 			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
 			v8::Isolate *Isolate = NULL )
 		{
-			if ( !Value->IsNumber() )
-				qRFwk();
-
-			primitive::Init( Value, Isolate );
+			primitive::Init( Value, UndefinedForbidden, &v8::Value::IsNumber, Isolate );
+		}
+		void Init(
+			v8::Local<v8::Value> Value,
+			v8::Isolate *Isolate = NULL )
+		{
+			Init( Value, true, Isolate );
 		}
 		void Init(
 			double Number,
@@ -738,9 +879,16 @@ namespace v8q {
 		}
 		void Init(
 			v8::Local<v8::Value> Value,
+			bso::sBool UndefinedForbidden,
 			v8::Isolate *Isolate = NULL )
 		{
-			value::Init( Value, Isolate );
+			value::Init( Value, UndefinedForbidden, &v8::Value::IsExternal, Isolate );
+		}
+		void Init(
+			v8::Local<v8::Value> Value,
+			v8::Isolate *Isolate = NULL )
+		{
+			Init( Value, true, Isolate );
 		}
 		void Init(
 			const type *External,
@@ -876,7 +1024,7 @@ qRE
 template <typename name> inline void v8q::xString_<name>::Get( str::dString &String )
 {
 qRH
-	flx::rStringTOflow Flow;
+	flx::rStringTOFlow Flow;
 qRB
 	Flow.Init( String );
 

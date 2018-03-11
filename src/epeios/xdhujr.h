@@ -33,6 +33,7 @@
 
 namespace xdhujr {
 	using rgstry::entry___;
+	using rgstry::rEntry;
 
 	extern entry___ CustomItems;
 
@@ -56,13 +57,11 @@ namespace xdhujr {
 	namespace script {
 		extern entry___ Log;
 		namespace fetcher {
-			extern entry___ EventsAndWidgets;
-			extern entry___ Casts;
-			extern entry___ Contents;
+			extern entry___ Events;
+			extern entry___ Widgets;
 		};
 		namespace setter{
 			extern entry___ EventHandlers;
-			extern entry___ Casts;
 			extern entry___ Contents;
 		}
 		extern entry___ DraggableSetter;
@@ -91,6 +90,24 @@ namespace xdhujr {
 			extern entry___ ValueRetriever;
 			extern entry___ Focuser;
 			extern entry___ Selector;
+		}
+		namespace css_rule {
+			extern rEntry
+				Insert,
+				Append,
+				Remove;
+		}
+		namespace classes	{
+			extern rEntry
+				Add,
+				Remove,
+				Toggle;
+
+		};
+		namespace elements {
+			extern rEntry
+				Enable,
+				Disable;
 		}
 	}
 

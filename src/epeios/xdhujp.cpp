@@ -195,6 +195,40 @@ static void HandleWidgets_(
 	ParametersSetsTag.Append( " ]");
 }
 
+static void SetLayout_(
+	cJS &Callback,
+	const nchar__ *Id,	// If 'Id' != NULL, it's the id of the element to apply to, otherwise it applies to the document.
+	const nchar__ *XML,
+	const nchar__ *XSL )
+{
+qRH
+	TOL_CBUFFER___ Result;
+	str::string RawDigest;
+	xdhcmn::digest Digest;
+qRB
+	RawDigest.Init( Execute( Callback, xdhujs::snEventsFetcher, &Result, Id, XML, XSL ) );
+
+	Digest.Init();
+	xdhcmn::Split( RawDigest, Digest );
+
+	HandleEvents_( Callback, Digest );
+qRR
+qRT
+qRE
+}
+
+static void SetLayout_(
+	cJS &Callback,
+	va_list List )
+{
+	// NOTA : we use variables, because if we put 'va_arg()' directly as parameter to below function, it's not sure that they are called in the correct order.
+	const nchar__ *Id = va_arg( List, const nchar__ * );
+	const nchar__ *XML = va_arg( List, const nchar__ * );
+	const nchar__ *XSL = va_arg( List, const nchar__ * );
+
+	SetLayout_( Callback, Id, XML, XSL );
+}
+
 static void HandleWidgets_(
 	cJS &Callback,
 	const xdhcmn::digest_ &Descriptions )
@@ -221,196 +255,44 @@ qRT
 qRE
 }
 
-static void SetLayout_(
+static void HandleWidgets_(
 	cJS &Callback,
-	const nchar__ *Id,	// If 'Id' != NULL, it's the id of the element to apply to, otherwise it applies to the document.
-	const nchar__ *XML,
-	const nchar__ *XSL )
-{
-qRH
-	TOL_CBUFFER___ Result;
-	str::string RawDigests;
-	xdhcmn::digest Digests, Events, Widgets;
-	xdhcmn::retriever__ Retriever;
-qRB
-	RawDigests.Init( Execute( Callback, xdhujs::snEventsAndWidgetsFetcher, &Result, Id, XML, XSL ) );
-
-	Digests.Init();
-	xdhcmn::Split( RawDigests, Digests );
-
-	Retriever.Init( Digests );
-
-	Events.Init();
-	Retriever.GetTable( Events );
-
-	Widgets.Init();
-	Retriever.GetTable( Widgets );
-
-	HandleEvents_( Callback, Events );
-
-	HandleWidgets_( Callback, Widgets );
-qRR
-qRT
-qRE
-}
-
-static void SetLayout_(
-	cJS &Callback,
-	va_list List )
-{
-	// NOTA : we use variables, because if we put 'va_arg()' directly as parameter to below function, it's not sure that they are called in the correct order.
-	const nchar__ *Id = va_arg( List, const nchar__ * );
-	const nchar__ *XML = va_arg( List, const nchar__ * );
-	const nchar__ *XSL = va_arg( List, const nchar__ * );
-
-	SetLayout_( Callback, Id, XML, XSL );
-}
-
-static void Merge_(
-	const str::strings_ &Ids,
-	const str::strings_ &Tags,
-	str::string_ &MergedIds,
-	str::string_ &MergedTags )
-{
-qRH
-	sdr::row__ Row = qNIL;
-	str::wString EscapedTag;
-qRB
-	if ( Ids.Amount() != Tags.Amount() )
-		qRFwk();
-
-	Row = Ids.First();
-
-	MergedIds.Append( "[ " );
-	MergedTags.Append( "[ ");
-
-	while ( Row != qNIL ) {
-		MergedIds.Append('"');
-		MergedIds.Append( Ids( Row) );
-		MergedIds.Append('"');
-
-		EscapedTag.Init();
-		xdhcmn::Escape( Tags( Row ), EscapedTag, '"' );
-
-		MergedTags.Append('"');
-		MergedTags.Append( EscapedTag );
-		MergedTags.Append('"');
-
-		Row = Ids.Next( Row );
-
-		if ( Row != qNIL ) {
-			MergedIds.Append( ", " );
-			MergedTags.Append( ", " );
-		}
-	}
-
-	MergedIds.Append( " ]" );
-	MergedTags.Append( " ]");
-qRR
-qRT
-qRE
-}
-
-static void HandleCasts_(
-	cJS &Callback,
-	const xdhcmn::digest_ &Digest )
-{
-qRH
-	str::strings Ids, Castings;
-	str::string IdsTag, CastingsTag;
-qRB
-	Ids.Init();
-	Castings.Init();
-	xdhutl::GetTags( Digest, Ids, Castings );
-
-	if ( Ids.Amount() ) {
-		tol::Init( IdsTag, CastingsTag );
-		Merge_( Ids, Castings, IdsTag, CastingsTag );
-
-		Execute( Callback, xdhujs::snCastsSetter_, NULL, nstring___( IdsTag ).Internal()(), nstring___( CastingsTag ).Internal()() );
-	}
-qRR
-qRT
-qRE
-}
-
-static void SetCasting_(
-	cJS &Callback,
-	const nchar__ *Id,
-	const nchar__ *XML,
-	const nchar__ *XSL )
-{
-qRH
-	TOL_CBUFFER___ Result;
-	str::string RawDigests;
-	xdhcmn::digest Digest;
-qRB
-	RawDigests.Init( Execute( Callback, xdhujs::snCastsFetcher, &Result, Id, XML, XSL ) );
-
-	Digest.Init();
-	xdhcmn::Split( RawDigests, Digest );
-
-	HandleCasts_( Callback, Digest );
-qRR
-qRT
-qRE
-}
-
-static void SetCasting_(
-	cJS &Callback,
-	va_list List )
-{
-	// NOTA : we use variables, because if we put 'va_arg()' directly as parameter to below function, it's not sure that they are called in the correct order.
-	const nchar__ *Id = va_arg( List, const nchar__ * );
-	const nchar__ *XML = va_arg( List, const nchar__ * );
-	const nchar__ *XSL = va_arg( List, const nchar__ * );
-
-	SetCasting_( Callback, Id, XML, XSL );
-}
-
-static void HandleContents_(
-	cJS &Callback,
-	const xdhcmn::digest_ &Digest,
-	xdhcmn::cContent &ContentCallback )
-{
-qRH
-	str::wStrings Ids, Tags, Contents;
-	str::wString IdsTag, ContentsTag;
-qRB
-	tol::Init( Ids, Tags );
-	xdhutl::GetTags( Digest, Ids, Tags );
-
-	if ( Ids.Amount() ) {
-		tol::Init( Contents );
-		ContentCallback.GetContents( Tags, Contents );
-
-		tol::Init( IdsTag, ContentsTag );
-		Merge_( Ids, Contents, IdsTag, ContentsTag );
-
-		Execute( Callback, xdhujs::snContentsSetter, NULL, nstring___( IdsTag ).Internal()( ), nstring___( ContentsTag ).Internal()( ) );
-	}
-qRR
-qRT
-qRE
-}
-
-static void SetContents_(
-	cJS &Callback,
-	const nchar__ *Id,
-	xdhcmn::cContent &ContentCallback )
+	const nchar__ *Id )
 {
 qRH
 	TOL_CBUFFER___ Result;
 	str::string RawDigest;
-	strmrg::table Digest;
+	xdhcmn::digest Digest;
 qRB
-	RawDigest.Init( Execute(Callback, xdhujs::snContentsFetcher, &Result, Id ));
+	RawDigest.Init( Execute( Callback, xdhujs::snWidgetsFetcher, &Result, Id ) );
 
 	Digest.Init();
+	xdhcmn::Split( RawDigest, Digest );
 
-	strmrg::Split( RawDigest, Digest );
+	HandleWidgets_( Callback, Digest );
+qRR
+qRT
+qRE
+}
 
-	HandleContents_( Callback, Digest, ContentCallback );
+static void DressWidgets_(
+	cJS &Callback,
+	va_list List )
+{
+	const nchar__ *Id = va_arg( List, const nchar__ * );
+
+	HandleWidgets_( Callback, Id );
+}
+
+static void SetContents_(
+	cJS &Callback,
+	const nchar__ *Ids,
+	const nchar__ *Contents )
+{
+qRH
+	TOL_CBUFFER___ Result;
+qRB
+	Execute( Callback, xdhujs::snContentsSetter, NULL, Ids, Contents );
 qRR
 qRT
 qRE
@@ -418,12 +300,104 @@ qRE
 
 static void SetContents_(
 	cJS &Callback,
-	va_list List)
+	va_list List )
 {
-	const nchar__ *Id = va_arg(List, const nchar__ *);
-	xdhcmn::cContent *ContentCallback = va_arg( List, xdhcmn::cContent * );
+	// NOTA : we use variables, because if we put 'va_arg()' directly as parameter to below function, it's not sure that they are called in the correct order.
+	const nchar__ *Ids = va_arg( List, const nchar__ * );
+	const nchar__ *Contents = va_arg( List, const nchar__ * );
 
-	SetContents_( Callback, Id, *ContentCallback );
+	SetContents_( Callback, Ids, Contents );
+}
+
+namespace{
+	namespace {
+		// TODO: to optimize.
+		void GetIds_(
+			const str::dStrings &AllTags,	// All the tags ..
+			const str::dStrings &AllIds,		// with the corresponding ids.
+			const str::dString &Tag,
+			const str::dString &Value,
+			str::dStrings &Ids,
+			str::dStrings &Values )
+		{
+			sdr::sRow Row = AllTags.First();
+
+			while ( ( Row != qNIL ) && ( ( Row = str::Search( Tag, AllTags, Row ) ) != qNIL ) ) {
+				Ids.Append( AllIds( Row ) );
+				Values.Append( Value );
+				Row = AllTags.Next( Row );
+			}
+		}
+	}
+
+	void MatchTagsWithIds_(
+		const xdhcmn::digest_ &Digest,
+		const str::dStrings &Tags,
+		const str::dStrings &Values,
+		str::dStrings &Ids,
+		str::dStrings &CorrespondingValues )
+	{
+	qRH;
+		str::wStrings AllIds, AllTags;
+		sdr::sRow Row = qNIL;
+	qRB;
+		tol::Init( AllIds, AllTags );
+		xdhutl::GetTags( Digest, AllIds, AllTags );
+
+		Row = Tags.First();
+
+		while ( Row != qNIL ) {
+			GetIds_( AllTags, AllIds, Tags( Row ), Values( Row ), Ids, CorrespondingValues );
+
+			Row = Tags.Next( Row );
+		}
+	qRR;
+	qRT;
+	qRE;
+	}
+
+	void MatchTagsWithIds_(
+		const xdhcmn::digest_ &Digest,
+		const str::dString &MergedTags,
+		const str::dString &MergedValues,
+		str::dStrings &Ids,
+		str::dStrings &CorrespondingValues)
+	{
+	qRH;
+		str::wStrings Tags, Values;
+	qRB;
+		Tags.Init();
+		xdhcmn::FlatSplit( MergedTags, Tags );
+
+		Values.Init();
+		xdhcmn::FlatSplit( MergedValues, Values );
+
+		MatchTagsWithIds_( Digest, Tags, Values, Ids, CorrespondingValues );
+	qRR;
+	qRT;
+	qRE;
+	}
+
+	
+	void MatchTagsWithIds_(
+		const xdhcmn::digest_ &Digest,
+		const str::dString &MergedTags,
+		const str::dString &MergedValues,
+		str::dString &MergedIds,
+		str::dString &CorrespondingMergedValues)
+	{
+	qRH;
+		str::wStrings Ids, Values;
+	qRB;
+		tol::Init( Ids, Values );
+		MatchTagsWithIds_( Digest, MergedTags, MergedValues, Ids, Values );
+
+		xdhcmn::FlatMerge( Ids, MergedIds, true );
+		xdhcmn::FlatMerge( Values, CorrespondingMergedValues, true );
+	qRR;
+	qRT;
+	qRE;
+	}
 }
 
 static void GetValue_(
@@ -551,9 +525,155 @@ static void GetResult_(
 	GetResult_( Callback, va_arg( List, const nchar__ * ), Result );
 }
 
+namespace {
+	void InsertCSSRule_(
+		cJS &Callback,
+		const nchar__ *Rule,
+		const nchar__ *Index )
+	{
+	qRH;
+	qRB;
+		Execute( Callback, xdhujs::snCSSRuleInserter, NULL, nstring___( Rule ).Internal()(), nstring___( Index ).Internal()() );
+	qRR;
+	qRT;
+	qRE;
+	}
+}
+
+void InsertCSSRule_(
+	cJS &Callback,
+	va_list List )
+{
+	// NOTA : we use variables, because if we put 'va_arg()' directly as parameter to below function, it's not sure that they are called in the correct order.
+	const nchar__ *Rule = va_arg( List, const nchar__ * );
+	const nchar__ *Index = va_arg( List, const nchar__ * );
+
+	InsertCSSRule_( Callback, Rule, Index );
+}
+
+namespace {
+	void AppendCSSRule_(
+		cJS &Callback,
+		const nchar__ *Rule,
+		TOL_CBUFFER___ *Index )
+	{
+	qRH;
+	qRB;
+		Execute( Callback, xdhujs::snCSSRuleAppender, Index, Rule );
+	qRR;
+	qRT;
+	qRE;
+	}
+}
+
+static void AppendCSSRule_(
+	cJS &Callback,
+	TOL_CBUFFER___ *Result,
+	va_list List )
+{
+	AppendCSSRule_( Callback, va_arg( List, const nchar__ * ), Result );
+}
+
+
+
+namespace {
+	void RemoveCSSRule_(
+		cJS &Callback,
+		const nchar__ *Index )
+	{
+	qRH;
+	qRB;
+		Execute( Callback, xdhujs::snCSSRuleRemover, NULL, nstring___( Index ).Internal()() );
+	qRR;
+	qRT;
+	qRE;
+	}
+}
+
+static void RemoveCSSRule_(
+	cJS &Callback,
+	va_list List )
+{
+	RemoveCSSRule_( Callback, va_arg( List, const nchar__ * ) );
+}
+
+namespace {
+	void HandleClasses_(
+		cJS &Callback,
+		xdhujs::script_name__ ScriptName,
+		const nchar__ *Ids,
+		const nchar__ *Classes )
+	{
+	qRH;
+	qRB;
+		Execute( Callback, ScriptName, NULL, nstring___( Ids ).Internal()(), nstring___( Classes ).Internal()() );
+	qRR;
+	qRT;
+	qRE;
+	}
+}
+
+
+static void HandleClasses_(
+	cJS &Callback,
+	xdhujs::script_name__ ScriptName,
+	va_list List )
+{
+	// NOTA : we use variables, because if we put 'va_arg()' directly as parameter to below function, it's not sure that they are called in the correct order.
+	const nchar__ *Ids = va_arg( List, const nchar__ * );
+	const nchar__ *Classes = va_arg( List, const nchar__ * );
+
+	HandleClasses_( Callback, ScriptName, Ids, Classes );
+}
+
+namespace {
+	void EnableElements_(
+		cJS &Callback,
+		const nchar__ *Ids )
+	{
+	qRH;
+	qRB;
+		Execute( Callback, xdhujs::snElementsEnabler, NULL, nstring___( Ids ).Internal()() );
+	qRR;
+	qRT;
+	qRE;
+	}
+}
+
+static void EnableElements_(
+	cJS &Callback,
+	va_list List )
+{
+	EnableElements_( Callback, va_arg( List, const nchar__ * ) );
+}
+
+namespace {
+	void DisableElements_(
+		cJS &Callback,
+		const nchar__ *Ids )
+	{
+	qRH;
+	qRB;
+		Execute( Callback, xdhujs::snElementsDisabler, NULL, nstring___( Ids ).Internal()() );
+	qRR;
+	qRT;
+	qRE;
+	}
+}
+
+static void DisableElements_(
+	cJS &Callback,
+	va_list List )
+{
+	DisableElements_( Callback, va_arg( List, const nchar__ * ) );
+}
+
 static script_name__ Convert_( xdhcmn::function__ Function )
 {
 	switch ( Function ) {
+	case xdhcmn::fExecute:
+		return xdhujs::snExecute;
+		break;
 	case xdhcmn::fLog:
 		return xdhujs::snLog;
 		break;
@@ -596,10 +716,34 @@ static script_name__ Convert_( xdhcmn::function__ Function )
 	case xdhcmn::fSetLayout:
 		qRFwk();
 		break;
-	case xdhcmn::fSetCasting:
+	case xdhcmn::fDressWidgets:
 		qRFwk();
 		break;
 	case xdhcmn::fSetContents:
+		qRFwk();
+		break;
+	case xdhcmn::fInsertCSSRule:
+		qRFwk();
+		break;
+	case xdhcmn::fAppendCSSRule:
+		qRFwk();
+		break;
+	case xdhcmn::fRemoveCSSRule:
+		qRFwk();
+		break;
+	case xdhcmn::fAddClasses:
+		qRFwk();
+		break;
+	case xdhcmn::fRemoveClasses:
+		qRFwk();
+		break;
+	case xdhcmn::fToggleClasses:
+		qRFwk();
+		break;
+	case xdhcmn::fEnableElements:
+		qRFwk();
+		break;
+	case xdhcmn::fDisableElements:
 		qRFwk();
 		break;
 	default:
@@ -616,6 +760,7 @@ void xdhujp::sProxyCallback::XDHCMNProcess(
 	va_list List )
 {
 	switch ( Function ) {
+	case xdhcmn::fExecute:
 	case xdhcmn::fSetProperty:
 	case xdhcmn::fGetProperty:
 	case xdhcmn::fSetAttribute:
@@ -644,11 +789,35 @@ void xdhujp::sProxyCallback::XDHCMNProcess(
 	case xdhcmn::fSetLayout:
 		SetLayout_( C_(), List );
 		break;
-	case xdhcmn::fSetCasting:
-		SetCasting_( C_(), List);
+	case xdhcmn::fDressWidgets:
+		DressWidgets_( C_(), List);
 		break;
 	case xdhcmn::fSetContents:
 		SetContents_( C_(), List);
+		break;
+	case xdhcmn::fInsertCSSRule:
+		InsertCSSRule_( C_(), List );
+		break;
+	case xdhcmn::fAppendCSSRule:
+		AppendCSSRule_( C_(), Result, List );
+		break;
+	case xdhcmn::fRemoveCSSRule:
+		RemoveCSSRule_( C_(), List );
+		break;
+	case xdhcmn::fAddClasses:
+		HandleClasses_( C_(), xdhujs::snClassesAdder, List );
+		break;
+	case xdhcmn::fRemoveClasses:
+		HandleClasses_( C_(), xdhujs::snClassesRemover, List );
+		break;
+	case xdhcmn::fToggleClasses:
+		HandleClasses_( C_(), xdhujs::snClassesToggler, List );
+		break;
+	case xdhcmn::fEnableElements:
+		EnableElements_( C_(), List );
+		break;
+	case xdhcmn::fDisableElements:
+		DisableElements_( C_(), List );
 		break;
 	default:
 		qRFwk();

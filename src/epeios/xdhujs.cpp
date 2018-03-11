@@ -39,12 +39,14 @@ const str::string_ &xdhujs::GetTaggedScript(
 	str::string_ &Buffer )
 {
 	switch ( Script ) {
+	case snExecute:
+		Buffer = "%Value_%";	// The script to execute is given as is.
+		break;
 	C( Log, Log );
 	C( DialogAlert, dialog::Alert );
 	C( DialogConfirm, dialog::Confirm );
-	C( EventsAndWidgetsFetcher, fetcher::EventsAndWidgets );
-	C( CastsFetcher, fetcher::Casts );
-	C( ContentsFetcher, fetcher::Contents );
+	C( EventsFetcher, fetcher::Events );
+	C( WidgetsFetcher, fetcher::Widgets );
 	C( PropertySetter, property::Setter );
 	C( PropertyGetter, property::Getter );
 	C( AttributeSetter, attribute::Setter );
@@ -58,9 +60,16 @@ const str::string_ &xdhujs::GetTaggedScript(
 	C( Focuser, Focuser );
 	C( Selector, Selector );
 	C( EventHandlersSetter, setter::EventHandlers );
-	C( CastsSetter_, setter::Casts );
 	C( ContentsSetter, setter::Contents );
 	C( WidgetsInstantiator, WidgetsInstantiator );
+	C( CSSRuleInserter, css_rule::Insert );
+	C( CSSRuleAppender, css_rule::Append );
+	C( CSSRuleRemover, css_rule::Remove );
+	C( ClassesAdder, classes::Add );
+	C( ClassesRemover, classes::Remove );
+	C( ClassesToggler, classes::Toggle );
+	C( ElementsEnabler, elements::Enable );
+	C( ElementsDisabler, elements::Disable );
 	default:
 		qRFwk();
 		break;
@@ -146,6 +155,9 @@ D( Casts );
 D( Contents );
 D( Types );
 D( ParametersSets );
+D( Rule );
+D( Index );
+D( Classes );
 
 #define S( name, ... )\
 	case sn##name:\
@@ -164,6 +176,7 @@ qRB
 	GetTaggedScript( ScriptName, TaggedScript );
 
 	switch ( ScriptName ) {
+	S( Execute, Value_, NULL );
 	S( Log, Message_, NULL );
 	S( DialogAlert, XML_, XSL_, Title_, CloseText_, NULL );
 	S( DialogConfirm, XML_, XSL_, Title_, CloseText_, NULL );
@@ -172,9 +185,8 @@ qRB
 	S( AttributeRemover, Id_, Name_, NULL  );
 	S( PropertySetter, Id_, Name_, Value_, NULL );
 	S( PropertyGetter, Id_, Name_, NULL );
-	S( EventsAndWidgetsFetcher, Id_, XML_, XSL_, NULL );
-	S( CastsFetcher, Id_, XML_, XSL_, NULL );
-	S( ContentsFetcher, Id_, NULL);
+	S( EventsFetcher, Id_, XML_, XSL_, NULL );
+	S( WidgetsFetcher, Id_, NULL );
 	S( ValueSetter, Id_, Value_, NULL );
 	S( ValueGetter, Id_, NULL );
 	S( WidgetValueRetriever, Id_, Method_, NULL );
@@ -183,9 +195,16 @@ qRB
 	S( Focuser, Id_, NULL );
 	S( Selector, Id_, NULL );
 	S( EventHandlersSetter, Ids_, Events_, NULL );
-	S( CastsSetter_, Ids_, Casts_, NULL );
 	S( ContentsSetter, Ids_, Contents_, NULL );
 	S( WidgetsInstantiator, Ids_, Types_, ParametersSets_, NULL );
+	S( CSSRuleInserter, Rule_, Index_, NULL );
+	S( CSSRuleAppender, Rule_, NULL );
+	S( CSSRuleRemover, Index_, NULL );
+	S( ClassesAdder, Ids_, Classes_, NULL );
+	S( ClassesRemover, Ids_, Classes_, NULL );
+	S( ClassesToggler, Ids_, Classes_, NULL );
+	S( ElementsEnabler, Ids_, NULL );
+	S( ElementsDisabler, Ids_, NULL );
 	default:
 		qRFwk();
 		break;

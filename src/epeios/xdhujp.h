@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 1999-2017 Claude SIMON (http://q37.info/contact/).
+	Copyright (C) 1999 Claude SIMON (http://q37.info/contact/).
 
 	This file is part of the Epeios framework.
 
@@ -94,7 +94,7 @@ namespace xdhujp {
 	public:
 		void reset( bso::bool__ P = true )
 		{
-			Callback_ = NULL;
+			tol::reset( P, Callback_ );
 		}
 		E_CVDTOR( sProxyCallback );
 		void Init( cJS &Callback )

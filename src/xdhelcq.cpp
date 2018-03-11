@@ -48,7 +48,7 @@ namespace {
 		{
 		qRH
 			flx::rStringOFlow BaseFlow;
-			txf::sOFlow Flow;
+			txf::sWFlow Flow;
 		qRB
 			BaseFlow.Init( Info );
 			Flow.Init( BaseFlow );
@@ -100,7 +100,6 @@ namespace {
 }
 
 namespace {
-
 	void InitWithModuleFilename_(
 		v8::Local<v8::Value> Module,
 		v8q::sLString &Filename )
@@ -254,7 +253,7 @@ namespace {
 			V8Return = v8q::Execute( Script.Convert( Buffer ), v8q::GetIsolate() );
 
 			if ( Return != NULL ) {
-				if ( !V8Return->IsNullOrUndefined() ) {
+				if ( !V8Return->IsNull() && !V8Return->IsUndefined() ) {
 					if ( V8Return->IsString() ) {
 						if ( !( String = V8Return->ToString() ).IsEmpty() ) {
 							Return->Malloc( String->Utf8Length() + 1 );	// '+ 1' for the NULL termination character.
@@ -335,7 +334,7 @@ namespace {
 		Identification.Append( " - Node v" NODE_VERSION_STRING "; ABI v" NODE_STRINGIFY( NODE_MODULE_VERSION ) " - " );
 		Identification.Append( "Build " __DATE__ " " __TIME__ " - " );
 		Identification.Append( cpe::GetDescription() );
-		Agent_.Init( xdhcmn::mMonoUser, ModuleFilename, Identification.Convert( IdentificationBuffer_ ) );
+		Agent_.Init( xdhcmn::mMonoUser, ModuleFilename, dlbrry::n_Default, Identification.Convert( IdentificationBuffer_ ) );
 
 		Session_.Init( Agent_.RetrieveCallback( Agent_.BaseLanguage( LanguageBuffer_ ), ProxyCallback ) );
 		sclmisc::SetBaseLanguage( str::wString( Agent_.BaseLanguage( Buffer ) ) );
@@ -346,23 +345,44 @@ namespace {
 	qRE;
 	}
 
+	void Initialize_( const v8::FunctionCallbackInfo<v8::Value>& Args )
+	{
+	qRFH;
+		v8q::sLString RawArguments;
+		str::wString Arguments, NormalizedArguments;
+	qRFB;
+		RawArguments.Init( Args[0]);
+
+		Arguments.Init();
+		RawArguments.Get( Arguments );
+
+		NormalizedArguments.Init();
+		sclargmnt::Normalize( Arguments, NormalizedArguments );
+
+		sclargmnt::FillRegistry( NormalizedArguments, sclargmnt::faIsCommand, sclargmnt::uaIgnore );
+
+		InitializeSession_();
+	qRFR;
+	qRFT;
+	qRFE( ErrFinal_() );
+	}
+
+
 	void Execute_( const v8::FunctionCallbackInfo<v8::Value>& Args )
 	{
-	qRH
+	qRFH;
 		v8q::sLString String;
 		str::wString Script;
-	qRB
+	qRFB;
 		String.Init( Args[0] );
 
 		Script.Init();
 		String.Get( Script );
 
-		Script.Append( ";alert('Yeah!');" );
-
 		JS_.Execute( Script );
-	qRR
-	qRT
-	qRE
+	qRFR;
+	qRFT;
+	qRFE( ErrFinal_() );
 	}
 }
 
@@ -378,14 +398,18 @@ namespace {
 		qRB
 			Id.Init();
 			Abstract.Init();
-			if ( xdhutl::FetchEventAbstract(Digest, Id, Abstract) ) {
-				if ( xdhutl::IsPredefined( Abstract.Action() ) )
-					qRVct();	//  HandlePredefinedAction_( Abstract.Action(), Abstract.UserAction, _B(), Id, Abstract.Args );
-				else if ( Abstract.Action() == xdhutl::a_User )
-					Stop = Session_.Launch( Id.Convert( IdBuffer ), Abstract.UserAction.Convert( ActionBuffer ) );
-				else
-					qRGnr();
-			}
+			if ( Digest.Amount() != 0 ) {
+				if ( xdhutl::FetchEventAbstract( Digest, Id, Abstract ) ) {
+					if ( xdhutl::IsPredefined( Abstract.Action() ) )
+						qRVct();	//  HandlePredefinedAction_( Abstract.Action(), Abstract.UserAction, _B(), Id, Abstract.Args );
+					else if ( Abstract.Action() == xdhutl::a_User )
+						Stop = Session_.Launch( Id.Convert( IdBuffer ), Abstract.UserAction.Convert( ActionBuffer ) );
+					else
+						qRGnr();
+				}
+			} else
+				Stop = Session_.Launch( IdBuffer, ActionBuffer );
+
 		qRR
 		qRT
 		qRE
@@ -395,19 +419,19 @@ namespace {
 
 	void LaunchEvent_( const v8::FunctionCallbackInfo<v8::Value>& Args )
 	{
-	qRH
+	qRFH;
 		v8q::sLString String;
 		str::wString Digest;
-	qRB
+	qRFB;
 		String.Init( Args[0] );
 
 		Digest.Init();
 		String.Get( Digest );
 	
 		HandleEvent_( Digest );
-	qRR
-	qRT
-	qRE
+	qRFR;
+	qRFT;
+	qRFE( ErrFinal_() );
 	}
 }
 
@@ -422,6 +446,7 @@ qRFH
 qRFB
 	NODE_SET_METHOD( Exports, "wrapperInfo", GetWrapperInfo_ );
 	NODE_SET_METHOD( Exports, "moduleInfo", GetModuleInfo_ );
+	NODE_SET_METHOD( Exports, "initialize", Initialize_ );
 	NODE_SET_METHOD( Exports, "execute", Execute_ );
 	NODE_SET_METHOD( Exports, "launchEvent", LaunchEvent_ );
 
@@ -437,8 +462,6 @@ qRFB
 	GetAddonLocation_( Module, Location );
 
 	sclmisc::Initialize( Rack_, Location );
-
-	InitializeSession_();
 
 	node::AtExit( OnExit_, NULL );
 qRFR

@@ -41,12 +41,12 @@ namespace xdhujs {
 	using xdhcmn::nstring___;
 
 	E_ENUM(script_name) {
+		snExecute,
 		snAttributeGetter,
 		snAttributeRemover,
 		snAttributeSetter,
-		snEventsAndWidgetsFetcher,
-		snCastsFetcher,
-		snContentsFetcher,
+		snEventsFetcher,
+		snWidgetsFetcher,
 		snValueGetter,
 		snValueSetter,
 		snDialogAlert,
@@ -60,9 +60,16 @@ namespace xdhujs {
 		snWidgetFocuser,
 		snWidgetSelector,
 		snEventHandlersSetter,
-		snCastsSetter_,
 		snContentsSetter,
 		snWidgetsInstantiator,
+		snCSSRuleInserter,
+		snCSSRuleAppender,
+		snCSSRuleRemover,
+		snClassesAdder,
+		snClassesRemover,
+		snClassesToggler,
+		snElementsEnabler,
+		snElementsDisabler,
 		sn_amount,
 		sn_Undefined,
 	};
@@ -80,7 +87,7 @@ namespace xdhujs {
 		script_name__ ScriptName,
 		str::string_ *Script,	// Was '&Script', but should not work due 'va_start(...)' restrictions concerning references (but it worked under MSVC).
 		... );
-
+	/*
 	inline void DialogAlert(
 		const nstring___ &XML,
 		const nstring___ &XSL,
@@ -131,6 +138,8 @@ namespace xdhujs {
 	{
 		GetScript( snPropertyGetter, &Script, Id.Internal()(), Name.Internal()() );
 	}
+	*/
+
 }
 
 #endif
