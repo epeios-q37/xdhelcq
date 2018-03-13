@@ -12,14 +12,13 @@
     "host": "https://github.com"
   },
   "dependencies": {
+    "node-pre-gyp": "0.8.0",
     "electron": "1.8.3",
     "electron-rebuild": "1.7.3"
   },
   "devDependencies": {},
   "scripts": {
-    "preinstall": "npm install node-pre-gyp",
-    "install": "node-pre-gyp install --fallback-to-build",
-    "test": "node test.js"
+    "install": "node-pre-gyp install || electron-rebuild"
   },
   "repository": {
     "type": "git",

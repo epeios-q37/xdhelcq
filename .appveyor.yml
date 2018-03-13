@@ -2,12 +2,8 @@ environment:
   version: 20180308
   affix: xdhelcq
   matrix:
+# The Node.js version used by the latest electron version (see http://electronjs.org).    
     - nodejs_version: "8"
-    - nodejs_version: "7"
-    - nodejs_version: "6"
-# Error when compiling against below version on 'AppVeyor'.
-#    - nodejs_version: "5"
-#    - nodejs_version: "4"
 
 skip_tags: true	
 
@@ -41,7 +37,7 @@ after_build:
 - mkdir %dir%
 - copy %affix%.node %dir%
 # It MUST be '.tar.gz' to be retrieved by 'node-pre-gyp' when installed with 'npm' !
-- 7z a %addon%.zip %dir%
+- 7z a %addon%.tar.gz %dir%
 
 # test_script:
 # - node --version
@@ -52,7 +48,7 @@ after_build:
 # - node -e "process.stdout.write( \"********** 'XDHELCq' TEST BEGIN **********\n\" )" && node test.js && node -e "process.stdout.write( \"\n********** 'XDHELCq' TEST END **********\n\" )"
 
 artifacts:
-- path: '*.zip'
+- path: '*.tar.gz'
 
 deploy:
   tag: v$(version)
@@ -62,8 +58,8 @@ deploy:
     secure: kKebvPLjikQbZ7E1Vm8omoYc9K0wOcKxjWsglp3+D4fV9ev/FaWr8ZBI+AseOTis
   draft: false
   prerelease: false
-  on:
-   nodejs_version: "8"
+#  on:
+#   nodejs_version: "8"
 
 # matrix:
   # allow_failures:
