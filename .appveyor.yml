@@ -37,7 +37,7 @@ after_build:
 - mkdir %dir%
 - copy %affix%.node %dir%
 # It MUST be '.tar.gz' to be retrieved by 'node-pre-gyp' when installed with 'npm' !
-- 7z a %addon%.tar.gz %dir%
+- 7z a -ttar -so dummy %dir% | 7z a -si %addon%.tar.gz
 
 # test_script:
 # - node --version
