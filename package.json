@@ -18,7 +18,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "install": "node-pre-gyp install || electron-rebuild"
+    "postinstall": "node-pre-gyp install || electron-rebuild"
   },
   "repository": {
     "type": "git",
