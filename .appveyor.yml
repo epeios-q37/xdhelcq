@@ -2,7 +2,7 @@ environment:
   version: 20180308
   affix: xdhelcq
   matrix:
-# The Node.js version used by the latest electron version (see http://electronjs.org).    
+# The major number of the Node.js version used by the latest electron version (see http://electronjs.org).    
     - nodejs_version: "8"
 
 skip_tags: true	
