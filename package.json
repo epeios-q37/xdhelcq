@@ -1,14 +1,14 @@
 {
   "name": "xdhelcq",
-  "version": "2018.3.8a",
+  "version": "2018.3.9",
   "author": "Claude SIMON (http://q37.info/contact/)",
   "description": "'XDHTML' 'Electron' wrapper.",
   "main": "XDHELCq.js",
   "binary": {
     "module_name": "xdhelcq",
     "module_path": "./",
-    "remote_path": "./epeios-q37/xdhelcq/releases/download/v2018.3.8a/",
-    "package_name": "{module_name}-v2018.3.8a-{platform}-{arch}.tar.gz",
+    "remote_path": "./epeios-q37/xdhelcq/releases/download/v2018.3.9/",
+    "package_name": "{module_name}-v2018.3.9-{platform}-{arch}.tar.gz",
     "host": "https://github.com"
   },
   "dependencies": {
