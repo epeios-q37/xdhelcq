@@ -1,3 +1,5 @@
+# electron.travis
+
 os:
 - linux
 - osx
@@ -9,19 +11,6 @@ language: node_js
 node_js:
 # The major number of the Node.js version used by the latest electron version (see http://electronjs.org).    
 - "8"
-# Although compilation against some of the below versions may working, it isn't the case under 'Travis CI'.
-# - "7"
-# - "6"
-# - "5"
-#- "4"
-
-script:
-# Below commented commands are automatically done.
-#- npm install node-pre-gyp
-#- node-pre-gyp configure
-#- node-pre-gyp build
-#- npm install electron electron-rebuild
-#- ./node_modules/.bin/electron-rebuild
 
 # To disable building on tags. Tags are supposed to begin with 'v' and only containing digits.
 branches:

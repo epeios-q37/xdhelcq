@@ -28,16 +28,9 @@
         //	console.log( mergedArguments );
         xdhelcq.initialize(mergedArguments);
       }
-      function userHead() {
-        try {
-          return require(fs).readFileSync("head.html");
-        } catch (err) {
-          return "";
-        }
-      }
 
     </script>
-    <!-- $USER_HEAD -->
+    <!-- $USER_HEAD$ -->
   </head>
   <body id="XDHRoot">
     <script>
@@ -46,14 +39,14 @@
       var xdhelcqPath = null;
 
       if (process.env.EPEIOS_SRC) {
-        var addonPath = null;
+        let addonPath = null;
         if (process.platform == 'win32')
           addonPath = 'h:/bin/';
         else
           addonPath = '~/bin/';
-        xdhelcqPath = addonPath + 'xdhelcq.node';
+        xdhelcqPath = require('path').join(addonPath, 'xdhelcq.node');
       } else {
-        xdhelcqPath = './xdhelcq.node';
+        xdhelcqPath = require('path').join("$XDHELCQ_PATH$", "xdhelcq.node");
       }
 
       const xdhelcq = require(xdhelcqPath);
