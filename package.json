@@ -1,24 +1,24 @@
 {
   "name": "xdhelcq",
-  "version": "2018.3.11",
+  "version": "2018.3.12",
   "author": "Claude SIMON (http://q37.info/contact/)",
   "description": "'XDHTML' 'Electron' wrapper.",
   "main": "XDHELCq.js",
   "binary": {
     "module_name": "xdhelcq",
     "module_path": "./",
-    "remote_path": "./epeios-q37/xdhelcq/releases/download/v20180311/",
-    "package_name": "{module_name}-v20180311-{platform}-{arch}.tar.gz",
+    "remote_path": "./epeios-q37/xdhelcq/releases/download/v20180312/",
+    "package_name": "{module_name}-v20180312-{platform}-{arch}.tar.gz",
     "host": "https://github.com"
   },
   "dependencies": {
     "node-pre-gyp": "0.6.x",
-    "electron": "1.8.4"
+    "electron": "2.0.0-beta.5"
   },
   "devDependencies": {},
   "scripts": {
     "preinstall": "npm install node-pre-gyp@0.6.x",
-    "install": "node-pre-gyp install --fallback-to-build --target=8.2.1"
+    "install": "node-pre-gyp install --fallback-to-build --target=8.9.3"
   },
   "repository": {
     "type": "git",
